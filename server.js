@@ -8,6 +8,8 @@ const courseRoutes = require('./routes/courseRoutes');
 
 const app = express();
 
+const { logger, consoleLogger } = require('./utils/logger');
+
 // Middleware
 app.use(express.json());
 app.use(morgan('dev'));
