@@ -49,32 +49,35 @@ const deleteCourse = async (req, res, next) => {
 };
 
 const enrollCourse = async (req, res, next) => {
-    try {
-      const course = await Course.findById(req.params.id);
-      const student = req.userData;
-  
-      if (!course) {
-        return res.status(404).json({ error: 'Course not found' });
-      }
-  
-      if (course.enrolledStudents.length >= course.maxStudents) {
-        return res.status(400).json({ error: 'Course is full' });
-      }
-  
-      if (student.registeredCourses.includes(course._id)) {
-        return res.status(400).json({ error: 'Already enrolled in this course' });
-      }
-  
-      course.enrolledStudents.push(student._id);
-      student.registeredCourses.push(course._id);
-  
-      await course.save();
-      await student.save();
-  
-      res.status(200).json({ message: 'Enrolled successfully' });
-    } catch (err) {
-      next(err);
+  try {
+    const course = await Course.findOne({ courseId: req.params.id });
+    const student = await Student.findById(req.user.id);
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
     }
-  };
+
+    // Check if the course is already full
+    if (course.enrolledStudents.length >= course.maxStudents) {
+      return res.status(400).json({ error: 'Course is full' });
+    }
+
+    // Check if the student is already enrolled
+    if (student.registeredCourses.includes(course._id)) {
+      return res.status(400).json({ error: 'Already enrolled in this course' });
+    }
+
+    // Enroll the student
+    course.enrolledStudents.push(student._id);
+    student.registeredCourses.push(course._id);
+
+    await course.save();
+    await student.save();
+
+    res.status(200).json({ message: 'Enrolled successfully', course });
+  } catch (err) {
+    next(err);
+  }
+};
 
 module.exports = { getCourses, addCourse, updateCourse, deleteCourse, enrollCourse };

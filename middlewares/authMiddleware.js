@@ -45,7 +45,12 @@ const authorizeStudent = async (req, res, next) => {
   const student = req.userData;
   const { id } = req.params;
 
-  // Ensure the student is enrolled in the course for any operations
+  // Skip authorization check for enrollment
+  if (req.method === 'POST' && req.url.endsWith('/enroll')) {
+    return next();
+  }
+
+  // For other endpoints, ensure the student is already enrolled
   if (!student.registeredCourses.includes(id)) {
     return res.status(403).json({ error: 'You are not authorized for this course' });
   }
