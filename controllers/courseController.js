@@ -50,14 +50,16 @@ const deleteCourse = async (req, res, next) => {
 
 const enrollCourse = async (req, res, next) => {
   try {
-    const course = await Course.findOne({ courseId: req.params.id });
-    const student = await Student.findById(req.user.id);
+    // Find course by _id (MongoDB default field)
+    const course = await Course.findById(req.params.id);
 
     if (!course) {
       return res.status(404).json({ error: 'Course not found' });
     }
 
-    // Check if the course is already full
+    const student = await Student.findById(req.user.id);
+
+    // Check if the course is full
     if (course.enrolledStudents.length >= course.maxStudents) {
       return res.status(400).json({ error: 'Course is full' });
     }
@@ -67,7 +69,7 @@ const enrollCourse = async (req, res, next) => {
       return res.status(400).json({ error: 'Already enrolled in this course' });
     }
 
-    // Enroll the student
+    // Add student to the course
     course.enrolledStudents.push(student._id);
     student.registeredCourses.push(course._id);
 
