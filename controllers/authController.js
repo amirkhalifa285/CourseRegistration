@@ -17,26 +17,27 @@ const signUp = async (req, res, next) => {
         name,
         address,
         year,
-        password: hashedPassword, // Ensure the hashed password is being saved
+        password: hashedPassword, // Save hashed password
       });
     } else if (role === 'faculty') {
       user = new Faculty({
         facultyId,
         name,
         address,
-        password: hashedPassword, // Ensure the hashed password is being saved
+        password: hashedPassword, // Save hashed password
       });
     } else {
       return res.status(400).json({ error: 'Invalid role specified' });
     }
 
-    // Save the user to the database
     await user.save();
     res.status(201).json({ message: 'User registered successfully' });
   } catch (err) {
+    console.error('Error during sign-up:', err);
     next(err);
   }
 };
+
 
 
 const login = async (req, res, next) => {

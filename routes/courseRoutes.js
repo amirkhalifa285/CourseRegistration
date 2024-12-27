@@ -20,4 +20,5 @@ router.delete('/:id', authMiddleware, authorizeFaculty, deleteCourse);
 // Student-only operations
 router.post('/:id/enroll', authMiddleware, authorizeStudent, enrollCourse);
 
+
 module.exports = router;

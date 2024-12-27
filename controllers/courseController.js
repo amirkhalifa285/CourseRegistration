@@ -23,7 +23,16 @@ const addCourse = async (req, res, next) => {
 
 const updateCourse = async (req, res, next) => {
   try {
-    const updatedCourse = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedCourse = await Course.findByIdAndUpdate(
+      req.params.id, // Course ID from URL
+      req.body,      // Fields to update
+      { new: true, runValidators: true } // Options: return updated doc and validate
+    );
+
+    if (!updatedCourse) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
     res.status(200).json(updatedCourse);
   } catch (err) {
     next(err);
