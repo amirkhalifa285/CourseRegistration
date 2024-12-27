@@ -5,6 +5,7 @@ const {
   updateCourse,
   deleteCourse,
   enrollCourse,
+  unenrollCourse,
 } = require('../controllers/courseController');
 const { authMiddleware, authorizeFaculty, authorizeStudent } = require('../middlewares/authMiddleware');
 const router = express.Router();
@@ -19,6 +20,6 @@ router.delete('/:id', authMiddleware, authorizeFaculty, deleteCourse);
 
 // Student-only operations
 router.post('/:id/enroll', authMiddleware, authorizeStudent, enrollCourse);
-
+router.delete('/:id/enroll', authMiddleware, authorizeStudent, unenrollCourse);
 
 module.exports = router;

@@ -82,4 +82,40 @@ const enrollCourse = async (req, res, next) => {
   }
 };
 
-module.exports = { getCourses, addCourse, updateCourse, deleteCourse, enrollCourse };
+const unenrollCourse = async (req, res, next) => {
+  try {
+    // Find the course by ID
+    const course = await Course.findById(req.params.id);
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    const student = await Student.findById(req.user.id);
+
+    // Check if the student is enrolled in the course
+    if (!student.registeredCourses.includes(course._id)) {
+      return res.status(400).json({ error: 'Student is not enrolled in this course' });
+    }
+
+    // Remove the student from the course's enrolled students
+    course.enrolledStudents = course.enrolledStudents.filter(
+      (studentId) => studentId.toString() !== req.user.id
+    );
+
+    // Remove the course from the student's registered courses
+    student.registeredCourses = student.registeredCourses.filter(
+      (courseId) => courseId.toString() !== req.params.id
+    );
+
+    // Save the updated documents
+    await course.save();
+    await student.save();
+
+    res.status(200).json({ message: 'Unenrolled successfully' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { getCourses, addCourse, updateCourse, deleteCourse, enrollCourse, unenrollCourse };
