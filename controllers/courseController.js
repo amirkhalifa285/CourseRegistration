@@ -118,4 +118,35 @@ const unenrollCourse = async (req, res, next) => {
   }
 };
 
-module.exports = { getCourses, addCourse, updateCourse, deleteCourse, enrollCourse, unenrollCourse };
+const getStudentCredits = async (req, res) => {
+  try {
+    const studentId = req.user.id; 
+
+    // Find all courses where the student is enrolled
+    const courses = await Course.find({ enrolledStudents: studentId }).populate('enrolledStudents', 'name');
+
+    // Calculate total credits
+    const totalCredits = courses.reduce((sum, course) => sum + course.credits, 0);
+
+    return res.status(200).json({ totalCredits });
+  } catch (error) {
+    console.error('Error fetching total credits:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const getStudentCourses = async (req, res) => {
+  try {
+    const studentId = req.user.id; // Assuming `authMiddleware` sets the logged-in user's ID
+
+    // Find all courses where the student is enrolled
+    const courses = await Course.find({ students: studentId });
+
+    return res.status(200).json({ courses });
+  } catch (error) {
+    console.error('Error fetching student courses:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { getCourses, addCourse, updateCourse, deleteCourse, enrollCourse, unenrollCourse, getStudentCredits, getStudentCourses };
