@@ -51,7 +51,7 @@ const authorizeStudent = async (req, res, next) => {
   }
 
   // For other endpoints, ensure the student is already enrolled
-  if (!student.registeredCourses.includes(id)) {
+  if (id && !student.registeredCourses.includes(id)) {
     return res.status(403).json({ error: 'You are not authorized for this course' });
   }
 

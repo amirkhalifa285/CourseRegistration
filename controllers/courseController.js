@@ -118,34 +118,26 @@ const unenrollCourse = async (req, res, next) => {
   }
 };
 
-const getStudentCredits = async (req, res) => {
+const getStudentCredits = async (req, res, next) => {
   try {
-    const studentId = req.user.id; 
-
-    // Find all courses where the student is enrolled
-    const courses = await Course.find({ enrolledStudents: studentId }).populate('enrolledStudents', 'name');
-
-    // Calculate total credits
+    const student = req.userData;
+    const courses = await Course.find({ _id: { $in: student.registeredCourses } });
     const totalCredits = courses.reduce((sum, course) => sum + course.credits, 0);
 
-    return res.status(200).json({ totalCredits });
-  } catch (error) {
-    console.error('Error fetching total credits:', error);
-    return res.status(500).json({ message: 'Server error' });
+    res.status(200).json({ totalCredits });
+  } catch (err) {
+    next(err);
   }
 };
 
-const getStudentCourses = async (req, res) => {
+const getStudentCourses = async (req, res, next) => {
   try {
-    const studentId = req.user.id; // Assuming `authMiddleware` sets the logged-in user's ID
+    const student = req.userData;
+    const courses = await Course.find({ _id: { $in: student.registeredCourses } });
 
-    // Find all courses where the student is enrolled
-    const courses = await Course.find({ students: studentId });
-
-    return res.status(200).json({ courses });
-  } catch (error) {
-    console.error('Error fetching student courses:', error);
-    return res.status(500).json({ message: 'Server error' });
+    res.status(200).json({ courses });
+  } catch (err) {
+    next(err);
   }
 };
 
