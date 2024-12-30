@@ -24,7 +24,7 @@ const signUp = async (req, res, next) => {
         facultyId,
         name,
         address,
-        password: hashedPassword, // Save hashed password
+        password: hashedPassword, 
       });
     } else {
       return res.status(400).json({ error: 'Invalid role specified' });
@@ -54,23 +54,17 @@ const login = async (req, res, next) => {
       return res.status(400).json({ error: 'Invalid role specified' });
     }
 
-    // Debug logs
-    console.log('User retrieved:', user);
-    console.log('Password provided:', password);
-
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     console.log('Hashed password in DB:', user.password);
 
-    // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Generate token
     const token = jwt.sign({ id: user._id, role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY });
     res.status(200).json({ accessToken: token });
   } catch (err) {

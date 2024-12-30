@@ -24,9 +24,9 @@ const addCourse = async (req, res, next) => {
 const updateCourse = async (req, res, next) => {
   try {
     const updatedCourse = await Course.findByIdAndUpdate(
-      req.params.id, // Course ID from URL
-      req.body,      // Fields to update
-      { new: true, runValidators: true } // Options: return updated doc and validate
+      req.params.id, 
+      req.body,      
+      { new: true, runValidators: true } 
     );
 
     if (!updatedCourse) {
@@ -50,7 +50,6 @@ const deleteCourse = async (req, res, next) => {
 
 const enrollCourse = async (req, res, next) => {
   try {
-    // Find course by _id (MongoDB default field)
     const course = await Course.findById(req.params.id);
 
     if (!course) {
@@ -59,17 +58,14 @@ const enrollCourse = async (req, res, next) => {
 
     const student = await Student.findById(req.user.id);
 
-    // Check if the course is full
     if (course.enrolledStudents.length >= course.maxStudents) {
       return res.status(400).json({ error: 'Course is full' });
     }
 
-    // Check if the student is already enrolled
     if (student.registeredCourses.includes(course._id)) {
       return res.status(400).json({ error: 'Already enrolled in this course' });
     }
 
-    // Add student to the course
     course.enrolledStudents.push(student._id);
     student.registeredCourses.push(course._id);
 
@@ -84,7 +80,6 @@ const enrollCourse = async (req, res, next) => {
 
 const unenrollCourse = async (req, res, next) => {
   try {
-    // Find the course by ID
     const course = await Course.findById(req.params.id);
 
     if (!course) {
@@ -93,22 +88,18 @@ const unenrollCourse = async (req, res, next) => {
 
     const student = await Student.findById(req.user.id);
 
-    // Check if the student is enrolled in the course
     if (!student.registeredCourses.includes(course._id)) {
       return res.status(400).json({ error: 'Student is not enrolled in this course' });
     }
 
-    // Remove the student from the course's enrolled students
     course.enrolledStudents = course.enrolledStudents.filter(
       (studentId) => studentId.toString() !== req.user.id
     );
 
-    // Remove the course from the student's registered courses
     student.registeredCourses = student.registeredCourses.filter(
       (courseId) => courseId.toString() !== req.params.id
     );
 
-    // Save the updated documents
     await course.save();
     await student.save();
 

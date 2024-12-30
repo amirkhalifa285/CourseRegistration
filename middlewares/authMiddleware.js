@@ -13,7 +13,6 @@ const authMiddleware = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
 
-    // Attach user data to the request based on role
     if (req.user.role === 'student') {
       req.userData = await Student.findById(req.user.id);
     } else if (req.user.role === 'faculty') {

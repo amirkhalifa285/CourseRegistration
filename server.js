@@ -20,7 +20,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/users', userRoutes);
 
-// Error handling
 const { errorHandler } = require('./middlewares/errorHandler');
 app.use(errorHandler);
 

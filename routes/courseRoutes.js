@@ -12,7 +12,6 @@ const {
 const { authMiddleware, authorizeFaculty, authorizeStudent } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
-// General access to view courses
 router.get('/', authMiddleware, getCourses);
 
 // Faculty-only operations
